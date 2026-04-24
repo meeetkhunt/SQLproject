@@ -41,3 +41,49 @@ ORDER BY
 LIMIT 1;
 
 -- Which city generates highest revenue
+
+SELECT
+    customers.city,
+    SUM(order_items.quantity * products.price) as Revenue
+FROM
+    customers
+JOIN orders
+    ON customers.customer_id = orders.customer_id
+JOIN order_items
+    ON orders.order_id = order_items.order_id
+JOIN products
+    ON order_items.product_id = products.product_id
+GROUP BY
+    customers.city
+ORDER BY
+    SUM(order_items.quantity * products.price) DESC;
+
+-- Monthly sales trend
+
+SELECT
+    EXTRACT(MONTH FROM order_date),
+    SUM(order_items.quantity * products.price) as Sales
+FROM
+    orders
+JOIN order_items
+    ON orders.order_id = order_items.order_id
+JOIN products
+    ON order_items.product_id = products.product_id
+GROUP BY
+   EXTRACT(MONTH FROM order_date)
+ORDER BY
+    EXTRACT(MONTH FROM order_date) ASC;
+   
+-- Customers who never placed an order
+
+SELECT 
+    customer_id, 
+    name
+FROM 
+    customers
+WHERE  
+    customer_id 
+    NOT IN 
+(
+    SELECT customer_id FROM orders
+);
